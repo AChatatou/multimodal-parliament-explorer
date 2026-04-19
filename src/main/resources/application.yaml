@@ -3,3 +3,26 @@ spring:
     name: Multimodal-Parliament-Explorer
   mongodb:
     uri: "mongodb://localhost:27017/parliament_explorer"
+
+app:
+  datasource:
+    root: "https://www.bundestag.de"
+    mdb-data: "https://www.bundestag.de/resource/blob/472878/MdB-Stammdaten.zip"
+    mdb-photos: "https://www.bundestag.de/ajax/filterlist/webarchiv/abgeordnete/biografien20/862712-862712"
+    speech-data: "https://www.bundestag.de/services/opendata"
+    xmi-folder: "/Users/adilc/Downloads/nlp-dokumente-abschlussprojekt-main-xmi/xmi"
+
+  duui:
+    mode: "remote"
+
+    spacy-remote-url: "http://spacy.service.component.duui.texttechnologylab.org"
+    gervader-remote-url: "http://gervader.service.component.duui.texttechnologylab.org"
+    parlbert-remote-url: "http://parlbert.service.component.duui.texttechnologylab.org"
+    sarcasm-remote-url: "http://sarcasm.service.component.duui.texttechnologylab.org"
+    whisperx-remote-url: "http://whisperx.service.component.duui.texttechnologylab.org"
+
+    spacy-docker-image: "docker.texttechnologylab.org/textimager-duui-spacy-single-de_core_news_sm:0.1.4"
+    gervader-docker-image: "docker.texttechnologylab.org/gervader_duui:1.0.2"
+    parlbert-docker-image: "docker.texttechnologylab.org/parlbert-topic-german:latest"
+    sarcasm-docker-image: "docker.texttechnologylab.org/duui-sarcasm-multilingual-sarcasm-detector:latest"
+    whisperx-docker-image: "docker.texttechnologylab.org/duui-whisperx:3.0.0-cuda"
