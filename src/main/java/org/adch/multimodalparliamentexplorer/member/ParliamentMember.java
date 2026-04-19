@@ -10,7 +10,7 @@ import java.util.List;
 @Document(collection = "mdb")
 @Getter
 @Builder
-public class ParliamentMemberDoc {
+public class ParliamentMember {
 
     @Id
     private String id;

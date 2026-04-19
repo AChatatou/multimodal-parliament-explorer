@@ -13,7 +13,7 @@ import java.util.List;
 @Document(collection = "session")
 @Getter
 @Builder
-public class SessionDoc {
+public class Session {
 
     @Id
     private String sessionNumber;

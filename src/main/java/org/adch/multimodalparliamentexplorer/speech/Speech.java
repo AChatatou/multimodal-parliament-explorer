@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Document(collection = "speech")
 @Getter
 @Builder
-public class SpeechDoc {
+public class Speech {
 
     @Id
     private String id;
