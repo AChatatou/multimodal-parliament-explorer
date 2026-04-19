@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.session;
+package org.adch.multimodalparliamentexplorer.importer.model;
 
 import lombok.Builder;
 import lombok.Getter;
