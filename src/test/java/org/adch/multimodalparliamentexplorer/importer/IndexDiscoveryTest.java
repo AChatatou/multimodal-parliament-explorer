@@ -30,9 +30,9 @@ public class IndexDiscoveryTest {
 
 
     @Test
-    void shouldGetBatch(){
+    void shouldGetBatchAndIncrement(){
         indexDiscovery.initDiscovery("20");
-        assertNotNull(indexDiscovery.getNextUrlBatch());
+        assertTrue(indexDiscovery.getNextUrlBatch().join().batchSize() > 0);
         assertEquals(1, indexDiscovery.getFetchedBatchesCount());
     }
 }
