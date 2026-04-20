@@ -1,0 +1,151 @@
+package org.adch.multimodalparliamentexplorer.importer;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.adch.multimodalparliamentexplorer.importer.model.XmlUrlBatch;
+import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
+import org.adch.multimodalparliamentexplorer.utils.UrlUtils;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@Slf4j
+@Getter
+@Component
+public class IndexDiscovery {
+
+    private final String sourceUrl;
+    private String baseUrl = "";
+    private int totalXmlUrlCount;
+    private List<CompletableFuture<XmlUrlBatch>> batchesFutures = new ArrayList<>();
+    private final AtomicInteger fetchedBatches = new AtomicInteger(0);
+
+    private static final CompletableFuture<XmlUrlBatch> EMPTY_BATCH_FUTURE =
+            CompletableFuture.completedFuture(new XmlUrlBatch(List.of()));
+
+
+    public IndexDiscovery(@Value("${app.datasource.speech-data}") String sourceUrl) {
+        this.sourceUrl = sourceUrl;
+    }
+
+    private void extractBaseImportUrl(String legislativePeriod) {
+
+        var sourceDoc = HtmlParser.fetchAsync(sourceUrl).join();
+        log.info("Extracting XML URLs from {}", sourceUrl);
+        var dataSections = sourceDoc.select("section[data-dataloader-url]");
+
+        baseUrl = dataSections.stream()
+//                .peek(sectionElement -> {
+//                    System.out.println("Found element: " + sectionElement.tagName());
+//                    //System.out.println("SECTION HTML:\n" + sectionElement.outerHtml());
+//                })
+                .filter(sectionElement -> getLegislativePeriodFromElement(sectionElement).equals(legislativePeriod))
+                .map(sectionElement -> UrlUtils.getUriBase(sourceUrl) + sectionElement.attr("data-dataloader-url"))
+                .limit(1)
+                .collect(Collectors.joining());
+    }
+
+    private String getLegislativePeriodFromElement(Element element) {
+
+        var heading = element.selectFirst("h2.bt-title");
+
+        if (heading == null) {
+            log.warn("No h2.bt-title element found in this section");
+            return "";
+        }
+
+        String text = heading.text();
+        //System.out.println("Found heading text: " + text);
+
+        var pattern = Pattern.compile("(\\d+)\\.\\s*Wahlperiode");
+        var matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            String legislativePeriod = matcher.group(1);
+            //System.out.println("Extracted: " + legislativePeriod);
+            return legislativePeriod;
+        }
+
+        log.warn("Legislative Period could not be extracted from this section");
+        return "";
+    }
+
+
+    private void extractTotalXmlUrls(Document html) {
+        var hitsElement = html.selectFirst("div[data-hits]");
+        if (hitsElement == null) {
+            log.warn("Total number of XML urls could not be read. Defaulting to 0");
+            totalXmlUrlCount = 0;
+            return;
+        }
+
+        try {
+            totalXmlUrlCount = Integer.parseInt(hitsElement.attr("data-hits"));
+        } catch (NumberFormatException e) {
+            log.warn("An error occurred while parsing the url count. Defaulting to 0");
+            totalXmlUrlCount = 0;
+        }
+    }
+
+    private XmlUrlBatch extractXmlUrlsFromPage(Document html) {
+        return new XmlUrlBatch(
+                html
+                .select("a[href]")
+                .stream()
+                .map(element -> element.attr("href").trim())
+                .filter(href -> !href.isBlank() && href.endsWith(".xml"))
+                .toList()
+        );
+    }
+
+
+    public void initDiscovery(String legislativePeriod) {
+        extractBaseImportUrl(legislativePeriod);
+
+        var firstPage = HtmlParser.fetchAsync(baseUrl).join();
+        extractTotalXmlUrls(firstPage);
+
+        List<CompletableFuture<XmlUrlBatch>> futures = new ArrayList<>();
+
+        futures.add(
+                CompletableFuture.completedFuture(firstPage)
+                        .thenApply(this::extractXmlUrlsFromPage)
+        );
+
+        IntStream.iterate(10, i -> i < totalXmlUrlCount, i -> i + 10)
+                .mapToObj(i -> baseUrl + "?offset=" + i)
+                .map(url -> HtmlParser.fetchAsync(url)
+                        .thenApply(this::extractXmlUrlsFromPage))
+                .forEach(futures::add);
+
+        log.info("Extracted {} batches of XML urls (Max batch size: 10). Total urls available: {}", futures.size(), totalXmlUrlCount);
+        this.batchesFutures = futures;
+    }
+
+
+    public CompletableFuture<XmlUrlBatch> getNextUrlBatch() {
+
+        if (batchesFutures == null || batchesFutures.isEmpty()) {
+            throw new IllegalStateException("XML urls have not been discovered");
+        }
+
+        int index = fetchedBatches.getAndIncrement();
+
+        if (index >= batchesFutures.size()) {
+            return EMPTY_BATCH_FUTURE;
+        }
+
+        return batchesFutures.get(index);
+    }
+
+
+}
