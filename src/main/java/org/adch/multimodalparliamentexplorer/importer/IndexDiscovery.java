@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,7 +41,7 @@ public class IndexDiscovery {
     private void extractBaseImportUrl(String legislativePeriod) {
 
         var sourceDoc = HtmlParser.fetchAsync(sourceUrl).join();
-        log.info("Extracting XML URLs from {}", sourceUrl);
+        log.info("Extracting XML URLs from {}. Legislative period selected: {}", sourceUrl, legislativePeriod);
         var dataSections = sourceDoc.select("section[data-dataloader-url]");
 
         baseUrl = dataSections.stream()
@@ -127,7 +128,7 @@ public class IndexDiscovery {
                         .thenApply(this::extractXmlUrlsFromPage))
                 .forEach(futures::add);
 
-        log.info("Extracted {} batches of XML urls (Max batch size: 10). Total urls available: {}", futures.size(), totalXmlUrlCount);
+        log.info("Selected legislative period: {}, Extracted {} batches of XML urls (Max batch size: 10). Total urls available: {}", legislativePeriod,  futures.size(), totalXmlUrlCount);
         this.batchesFutures = futures;
     }
 
@@ -146,6 +147,23 @@ public class IndexDiscovery {
 
         return batchesFutures.get(index);
     }
+
+
+    public void reset() {
+        fetchedBatches.set(0);
+        batchesFutures.clear();
+    }
+
+
+    public List<CompletableFuture<XmlUrlBatch>> getBatchesFutures() {
+        return Collections.unmodifiableList(batchesFutures);
+    }
+
+    public int getFetchedBatchesCount() {
+        return fetchedBatches.get();
+    }
+
+
 
 
 }
