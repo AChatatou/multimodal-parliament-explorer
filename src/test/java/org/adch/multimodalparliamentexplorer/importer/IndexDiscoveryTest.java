@@ -1,6 +1,7 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
 
+import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class IndexDiscoveryTest {
 
-    private final IndexDiscovery indexDiscovery = new IndexDiscovery("https://www.bundestag.de/services/opendata");
+    private final IndexDiscovery indexDiscovery = new IndexDiscovery("https://www.bundestag.de/services/opendata", new HtmlParser());
 
     @AfterEach
     void reset() {

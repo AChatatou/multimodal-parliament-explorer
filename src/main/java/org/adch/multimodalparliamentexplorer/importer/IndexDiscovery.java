@@ -29,18 +29,21 @@ public class IndexDiscovery {
     private int totalXmlUrlCount;
     private List<CompletableFuture<XmlUrlBatch>> batchesFutures = new ArrayList<>();
     private final AtomicInteger fetchedBatches = new AtomicInteger(0);
+    private final HtmlParser htmlParser;
 
     private static final CompletableFuture<XmlUrlBatch> EMPTY_BATCH_FUTURE =
             CompletableFuture.completedFuture(new XmlUrlBatch(List.of()));
 
 
-    public IndexDiscovery(@Value("${app.datasource.speech-data}") String sourceUrl) {
+    public IndexDiscovery(@Value("${app.datasource.speech-data}") String sourceUrl,
+                          HtmlParser htmlParser) {
         this.sourceUrl = sourceUrl;
+        this.htmlParser = htmlParser;
     }
 
     private void extractBaseImportUrl(String legislativePeriod) {
 
-        var sourceDoc = HtmlParser.fetchAsync(sourceUrl).join();
+        var sourceDoc = htmlParser.fetch(sourceUrl);
         log.info("Extracting XML URLs from {}. Legislative period selected: {}", sourceUrl, legislativePeriod);
         var dataSections = sourceDoc.select("section[data-dataloader-url]");
 
@@ -112,7 +115,7 @@ public class IndexDiscovery {
     public void initDiscovery(String legislativePeriod) {
         extractBaseImportUrl(legislativePeriod);
 
-        var firstPage = HtmlParser.fetchAsync(baseUrl).join();
+        var firstPage = htmlParser.fetch(baseUrl);
         extractTotalXmlUrls(firstPage);
 
         List<CompletableFuture<XmlUrlBatch>> futures = new ArrayList<>();
@@ -124,7 +127,7 @@ public class IndexDiscovery {
 
         IntStream.iterate(10, i -> i < totalXmlUrlCount, i -> i + 10)
                 .mapToObj(i -> baseUrl + "?offset=" + i)
-                .map(url -> HtmlParser.fetchAsync(url)
+                .map(url -> CompletableFuture.supplyAsync(() -> htmlParser.fetch(url))
                         .thenApply(this::extractXmlUrlsFromPage))
                 .forEach(futures::add);
 

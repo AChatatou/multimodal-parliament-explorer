@@ -2,14 +2,13 @@ package org.adch.multimodalparliamentexplorer.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.stereotype.Component;
 
-import java.util.concurrent.CompletableFuture;
-
+@Component
 public class HtmlParser {
 
-    public static CompletableFuture<Document> fetchAsync(String url) {
+    public Document fetch(String url) {
 
-        return CompletableFuture.supplyAsync(() -> {
             try {
                 return Jsoup.connect(url)
                         .userAgent("Mozilla/5.0")
@@ -19,6 +18,5 @@ public class HtmlParser {
                 System.out.println("Error while fetching: " + url);
                 throw new RuntimeException(e);
             }
-        });
     }
 }
