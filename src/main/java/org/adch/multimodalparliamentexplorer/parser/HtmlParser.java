@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HtmlParser {
 
-    public Document fetch(String url) {
+    public Document fetchAndParse(String url) {
 
             try {
                 return Jsoup.connect(url)

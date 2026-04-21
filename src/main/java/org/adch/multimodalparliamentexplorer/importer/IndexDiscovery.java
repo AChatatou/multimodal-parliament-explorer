@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.adch.multimodalparliamentexplorer.importer.model.XmlUrlBatch;
 import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
-import org.adch.multimodalparliamentexplorer.utils.UrlUtils;
+import org.adch.multimodalparliamentexplorer.importer.utils.UrlUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +43,7 @@ public class IndexDiscovery {
 
     private void extractBaseImportUrl(String legislativePeriod) {
 
-        var sourceDoc = htmlParser.fetch(sourceUrl);
+        var sourceDoc = htmlParser.fetchAndParse(sourceUrl);
         log.info("Extracting XML URLs from {}. Legislative period selected: {}", sourceUrl, legislativePeriod);
         var dataSections = sourceDoc.select("section[data-dataloader-url]");
 
@@ -115,7 +115,7 @@ public class IndexDiscovery {
     public void initDiscovery(String legislativePeriod) {
         extractBaseImportUrl(legislativePeriod);
 
-        var firstPage = htmlParser.fetch(baseUrl);
+        var firstPage = htmlParser.fetchAndParse(baseUrl);
         extractTotalXmlUrls(firstPage);
 
         List<CompletableFuture<XmlUrlBatch>> futures = new ArrayList<>();
@@ -127,7 +127,7 @@ public class IndexDiscovery {
 
         IntStream.iterate(10, i -> i < totalXmlUrlCount, i -> i + 10)
                 .mapToObj(i -> baseUrl + "?offset=" + i)
-                .map(url -> CompletableFuture.supplyAsync(() -> htmlParser.fetch(url))
+                .map(url -> CompletableFuture.supplyAsync(() -> htmlParser.fetchAndParse(url))
                         .thenApply(this::extractXmlUrlsFromPage))
                 .forEach(futures::add);
 
