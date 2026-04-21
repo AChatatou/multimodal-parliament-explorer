@@ -1,9 +1,7 @@
-package org.adch.multimodalparliamentexplorer.speech;
+package org.adch.multimodalparliamentexplorer.session.speech;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 import java.util.Optional;
