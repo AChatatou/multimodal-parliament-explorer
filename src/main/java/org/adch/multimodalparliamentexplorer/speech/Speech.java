@@ -10,12 +10,10 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Document(collection = "speech")
 @Getter
 @Builder
 public class Speech {
 
-    @Id
     private String id;
 
     private String sessionNumber;

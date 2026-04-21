@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer.model;
+package org.adch.multimodalparliamentexplorer.speech;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class Session {
 
     private Instant importDate;
 
-    private List<String> speeches;
+    private List<Speech> speeches;
 
 
 }
