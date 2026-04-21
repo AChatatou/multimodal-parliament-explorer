@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.utils;
+package org.adch.multimodalparliamentexplorer.importer.utils;
 
 import java.net.URI;
 import java.nio.file.Path;
