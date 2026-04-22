@@ -32,7 +32,9 @@ public class XmlParser {
 
     public Document fetchAndParse(String url) throws ParserConfigurationException, IOException, SAXException {
         var builder = dbf.newDocumentBuilder();      // new per call
-        return builder.parse(url);
+        var parsedDoc =  builder.parse(url);
+        parsedDoc.normalizeDocument();
+        return parsedDoc;
     }
 
 
