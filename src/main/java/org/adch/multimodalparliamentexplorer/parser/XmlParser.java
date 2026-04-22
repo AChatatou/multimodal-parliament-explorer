@@ -2,11 +2,13 @@ package org.adch.multimodalparliamentexplorer.parser;
 
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Component
 public class XmlParser {
@@ -30,11 +32,22 @@ public class XmlParser {
     }
 
 
-    public Document fetchAndParse(String url) throws ParserConfigurationException, IOException, SAXException {
-        var builder = dbf.newDocumentBuilder();      // new per call
-        var parsedDoc =  builder.parse(url);
+    private Document parse(org.xml.sax.InputSource source)
+            throws ParserConfigurationException, IOException, SAXException {
+        var builder = dbf.newDocumentBuilder();
+        var parsedDoc = builder.parse(source);
         parsedDoc.normalizeDocument();
         return parsedDoc;
+    }
+
+    public Document fetchAndParse(String url)
+            throws ParserConfigurationException, IOException, SAXException {
+        return parse(new InputSource(url));
+    }
+
+    public Document fetchAndParse(InputStream is)
+            throws ParserConfigurationException, IOException, SAXException {
+        return parse(new InputSource(is));
     }
 
 
