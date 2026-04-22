@@ -13,4 +13,13 @@ public record MdbZipData(
         String biography
 ) {
 
+    public static MdbZipData emptyMdbData(){
+        return new MdbZipData("?",
+                "?",
+                "?",
+                "?",
+                "?",
+                "?",
+                "");
+    }
 }

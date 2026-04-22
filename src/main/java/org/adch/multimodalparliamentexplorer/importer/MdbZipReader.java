@@ -1,5 +1,6 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import org.w3c.dom.Element;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -19,6 +21,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Component
+@Slf4j
 public class MdbZipReader {
 
     private final String zipSource;
@@ -26,47 +29,45 @@ public class MdbZipReader {
     private XmlParser xmlParser;
 
 
-    public MdbZipReader(@Value("${app.datasource.mdb-data}") String zipSource){
+    public MdbZipReader(@Value("${app.datasource.mdb-data}") String zipSource, XmlParser xmlParser){
         this.zipSource = zipSource;
+        this.xmlParser = xmlParser;
+        fetchAndParseMemberData(HttpClient.newHttpClient(), zipSource);
     }
 
 
-    public void fetchAndParseMemberData() {
-
-        var httpClient = HttpClient.newHttpClient();
+    public void fetchAndParseMemberData(HttpClient httpClient, String source) {
 
         var request = HttpRequest.newBuilder()
                 .GET()
                 .header("Accept", "application/zip")
-                .uri(URI.create(zipSource))
+                .uri(URI.create(source))
                 .build();
 
         try {
-
             var response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            try (InputStream inputStream = response.body();
-                 ZipInputStream zipIn = new ZipInputStream(new BufferedInputStream(inputStream), StandardCharsets.UTF_8)) {
-
-                ZipEntry entry;
-                while ((entry = zipIn.getNextEntry()) != null) {
-                    if (entry.getName().toLowerCase().endsWith(".xml")) {
-                        byte[] bytes = zipIn.readAllBytes();
-                        System.out.printf("Entry: %s, bytes read: %s%n", entry.getName(), bytes.length);
-                        parseContent(bytes);
-                        return;
-                    }
-                }
-            }
-
-
-            throw new RuntimeException("No XML file found in ZIP");
-
+            byte[] xml = extractXmlFromZip(response.body());
+            parseContent(xml);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
+
+    private byte[] extractXmlFromZip(InputStream inputStream) throws IOException {
+        try (ZipInputStream zipIn = new ZipInputStream(new BufferedInputStream(inputStream), StandardCharsets.UTF_8)) {
+            ZipEntry entry;
+            while ((entry = zipIn.getNextEntry()) != null) {
+                if (entry.getName().toLowerCase().endsWith(".xml")) {
+                    var bytes = zipIn.readAllBytes();
+                    log.info("Entry: {}, bytes read: {}", entry.getName(), bytes.length);
+                    return bytes;
+                }
+            }
+        }
+        throw new RuntimeException("No XML file found in ZIP");
+    }
+
 
     private void parseContent(byte[] input) throws Exception {
         try( var bais = new ByteArrayInputStream(input)) {
@@ -114,5 +115,12 @@ public class MdbZipReader {
                 .occupation(occupation)
                 .biography(biography)
                 .build();
+    }
+
+
+    public MdbZipData extractMemberData(String id) {
+        return extractMemberElement(id)
+                .map(this::extractDataFromMemberElement)
+                .orElseGet(MdbZipData::emptyMdbData);
     }
 }
