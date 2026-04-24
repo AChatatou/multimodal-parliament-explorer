@@ -23,5 +23,4 @@ public class ParliamentMember {
     private ParliamentMemberPhoto photo;
     private String biography;
 
-    private List<String> speeches;
 }
