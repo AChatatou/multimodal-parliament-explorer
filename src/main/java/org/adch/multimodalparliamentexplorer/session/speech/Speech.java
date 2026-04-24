@@ -14,8 +14,6 @@ public class Speech {
 
     private String id;
 
-    private String sessionNumber;
-
     private String speakerId;
 
     private String faction;
