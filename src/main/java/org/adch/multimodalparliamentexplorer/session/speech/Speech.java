@@ -18,7 +18,7 @@ public class Speech {
 
     private String speakerId;
 
-    private String Faction;
+    private String faction;
 
     private List<Segment> segments ;
 
