@@ -27,14 +27,15 @@ public class MdbPhotoExtractor {
 
     private final String source;
     private Map<String, MdbPhoto> memberFotos;
-    private HtmlParser htmlParser;
+    private final HtmlParser htmlParser;
 
     public MdbPhotoExtractor(@Value("${app.datasource.mdb-photos}") String photosSource, HtmlParser htmlParser) {
         this.source = photosSource;
         this.htmlParser = htmlParser;
+        fetchMemberPhotos();
     }
 
-    public void getMemberPhotos() throws IOException, InterruptedException {
+    public void fetchMemberPhotos() {
         var firstPage = htmlParser.fetchAndParse(source);
 
         var hitsElement = firstPage.selectFirst("div[data-hits]");
