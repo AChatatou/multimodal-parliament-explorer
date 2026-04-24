@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer.model.session;
+package org.adch.multimodalparliamentexplorer.importer.dto.session;
 
 import java.util.List;
 

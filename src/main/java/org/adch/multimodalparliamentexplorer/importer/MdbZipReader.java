@@ -1,7 +1,7 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
 import lombok.extern.slf4j.Slf4j;
-import org.adch.multimodalparliamentexplorer.importer.model.mdb.MdbZipData;
+import org.adch.multimodalparliamentexplorer.importer.dto.mdb.MdbZipData;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

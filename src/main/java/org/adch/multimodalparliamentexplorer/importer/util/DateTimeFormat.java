@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer.utils;
+package org.adch.multimodalparliamentexplorer.importer.util;
 
 import java.time.format.DateTimeFormatter;
 

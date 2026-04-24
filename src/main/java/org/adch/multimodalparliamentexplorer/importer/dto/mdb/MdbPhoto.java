@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer.model.mdb;
+package org.adch.multimodalparliamentexplorer.importer.dto.mdb;
 
 import lombok.Builder;
 

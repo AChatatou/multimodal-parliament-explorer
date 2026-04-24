@@ -2,9 +2,9 @@ package org.adch.multimodalparliamentexplorer.importer;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.adch.multimodalparliamentexplorer.importer.model.session.XmlUrlBatch;
+import org.adch.multimodalparliamentexplorer.importer.dto.session.XmlUrlBatch;
 import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
-import org.adch.multimodalparliamentexplorer.importer.utils.UrlUtils;
+import org.adch.multimodalparliamentexplorer.importer.util.UrlUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
