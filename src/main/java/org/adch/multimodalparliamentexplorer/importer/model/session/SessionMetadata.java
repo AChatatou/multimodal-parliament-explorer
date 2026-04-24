@@ -1,7 +1,6 @@
-package org.adch.multimodalparliamentexplorer.importer.model;
+package org.adch.multimodalparliamentexplorer.importer.model.session;
 
 import lombok.Builder;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

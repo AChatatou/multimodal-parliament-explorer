@@ -2,7 +2,7 @@ package org.adch.multimodalparliamentexplorer.importer;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.adch.multimodalparliamentexplorer.importer.model.XmlUrlBatch;
+import org.adch.multimodalparliamentexplorer.importer.model.session.XmlUrlBatch;
 import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
 import org.adch.multimodalparliamentexplorer.importer.utils.UrlUtils;
 import org.jsoup.nodes.Document;
@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 @Slf4j
 @Getter
 @Component
-public class IndexDiscovery {
+public class XmlIndexDiscovery {
 
     private final String sourceUrl;
     private String baseUrl = "";
@@ -35,8 +35,8 @@ public class IndexDiscovery {
             CompletableFuture.completedFuture(new XmlUrlBatch(List.of()));
 
 
-    public IndexDiscovery(@Value("${app.datasource.speech-data}") String sourceUrl,
-                          HtmlParser htmlParser) {
+    public XmlIndexDiscovery(@Value("${app.datasource.speech-data}") String sourceUrl,
+                             HtmlParser htmlParser) {
         this.sourceUrl = sourceUrl;
         this.htmlParser = htmlParser;
     }

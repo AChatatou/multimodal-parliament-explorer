@@ -2,7 +2,7 @@ package org.adch.multimodalparliamentexplorer.importer.steps;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.adch.multimodalparliamentexplorer.importer.model.*;
+import org.adch.multimodalparliamentexplorer.importer.model.session.*;
 import org.adch.multimodalparliamentexplorer.importer.utils.DateTimeFormat;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
 import org.adch.multimodalparliamentexplorer.pipeline.PipelineStep;

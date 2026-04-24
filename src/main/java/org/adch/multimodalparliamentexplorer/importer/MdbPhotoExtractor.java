@@ -1,5 +1,6 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
+import org.adch.multimodalparliamentexplorer.importer.model.mdb.MdbPhoto;
 import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

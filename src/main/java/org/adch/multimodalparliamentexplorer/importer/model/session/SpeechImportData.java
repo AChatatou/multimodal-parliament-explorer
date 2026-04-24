@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer.model;
+package org.adch.multimodalparliamentexplorer.importer.model.session;
 
 import lombok.Builder;
 import org.adch.multimodalparliamentexplorer.session.speech.Segment;
