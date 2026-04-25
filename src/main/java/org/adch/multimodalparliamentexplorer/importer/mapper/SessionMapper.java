@@ -12,8 +12,7 @@ import java.time.Instant;
 @Mapper(componentModel = "spring")
 public interface SessionMapper {
 
-    @Mapping(target = "speakerId", source = "speakerData.speakerId")
-    @Mapping(target = "faction", source = "speakerData.faction")
+
     Speech fromSpeechImportData(SpeechImportData speechImportData);
 
     @Mapping(target = "sourceXmlUrl", source = "xmlUrl")
@@ -22,6 +21,7 @@ public interface SessionMapper {
     @Mapping(target = "sessionDate", source = "sessionMetadata.date")
     @Mapping(target = "startTime", source = "sessionMetadata.startTime")
     @Mapping(target = "endTime", source = "sessionMetadata.endTime")
+    @Mapping(target = "speeches", source = "speechesImportData")
     @Mapping(target = "importDate", source = "importDate")
     Session fromSessionImportData(SessionImportData data, Instant importDate);
 }
