@@ -52,7 +52,8 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
         SessionMetadata metadata = extracSessionMetadata(parsedDocument)
                 .orElseGet(SessionMetadata::emptyMetadata);
 
-        List<SpeechImportData> dataList = new ArrayList<>();
+        List<SpeechImportData> speechDataList = new ArrayList<>();
+        List<SpeakerData> speakerDataList = new ArrayList<>();
 
         var speechNodes = parsedDocument.getElementsByTagName("rede");
 
@@ -62,6 +63,7 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
                     .xmlUrl(xmlUrl)
                     .sessionMetadata(metadata)
                     .speechesImportData(List.of())
+                    .speakersImportData(List.of())
                     .build();
         }
 
@@ -72,14 +74,17 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
                 continue;
 
             var speechElement = (Element) (node);
-            var speechData = extractSpeechData(speechElement);
-            dataList.add(speechData);
+            var speakerData = extractSpeakerData(speechElement);
+            speakerDataList.add(speakerData);
+            var speechData = extractSpeechData(speechElement, speakerData.speakerId(), speakerData.faction());
+            speechDataList.add(speechData);
         }
 
         return SessionImportData.builder()
                 .xmlUrl(xmlUrl)
                 .sessionMetadata(metadata)
-                .speechesImportData(dataList)
+                .speechesImportData(speechDataList)
+                .speakersImportData(speakerDataList)
                 .build();
     }
 
@@ -115,17 +120,18 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
     }
 
 
-    private static SpeechImportData extractSpeechData(Element speechElement) {
+    private static SpeechImportData extractSpeechData(Element speechElement, String speakerId, String faction) {
 
         String id = speechElement.getAttribute("id");
 
-        var speakerData = extractSpeakerData(speechElement);
+        //var speakerData = extractSpeakerData(speechElement);
 
-        var segments = extractSpeechText(speechElement, speakerData.speakerId());
+        var segments = extractSpeechText(speechElement, speakerId);
 
         return SpeechImportData.builder()
                 .id(id)
-                .speakerData(speakerData)
+                .speakerId(speakerId)
+                .faction(faction)
                 .segments(segments)
                 .build();
     }
@@ -152,8 +158,8 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
 
         return SpeakerData.builder()
                 .speakerId(speakerId)
-                .speakerFirstName(speakerFirstName)
-                .speakerLastName(speakerLastName)
+                .firstName(speakerFirstName)
+                .lastName(speakerLastName)
                 .faction(speakerFaction)
                 .build();
     }

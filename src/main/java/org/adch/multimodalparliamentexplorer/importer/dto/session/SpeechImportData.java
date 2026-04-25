@@ -9,7 +9,8 @@ import java.util.List;
 @Builder
 public record SpeechImportData(
         String id,
-        SpeakerData speakerData,
+        String speakerId,
+        String faction,
         List<Segment> segments
 ){
 }

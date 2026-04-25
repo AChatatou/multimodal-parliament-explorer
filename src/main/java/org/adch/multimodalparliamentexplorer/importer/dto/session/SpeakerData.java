@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record SpeakerData(
         String speakerId,
-        String speakerFirstName,
-        String speakerLastName,
+        String firstName,
+        String lastName,
         String faction
 ) {}

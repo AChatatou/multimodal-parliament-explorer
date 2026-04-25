@@ -8,6 +8,7 @@ import java.util.List;
 public record SessionImportData(
         String xmlUrl,
         SessionMetadata sessionMetadata,
-        List<SpeechImportData> speechesImportData
+        List<SpeechImportData> speechesImportData,
+        List<SpeakerData> speakersImportData
 ) {
 }
