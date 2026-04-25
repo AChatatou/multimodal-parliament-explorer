@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer.steps;
+package org.adch.multimodalparliamentexplorer.pipeline.steps;
 
 import lombok.AllArgsConstructor;
 import org.adch.multimodalparliamentexplorer.importer.MdbPhotoExtractor;

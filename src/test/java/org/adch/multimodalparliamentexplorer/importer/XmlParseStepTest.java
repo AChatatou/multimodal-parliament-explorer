@@ -1,6 +1,6 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
-import org.adch.multimodalparliamentexplorer.importer.steps.XmlParseStep;
+import org.adch.multimodalparliamentexplorer.pipeline.steps.XmlParseStep;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
 
 import org.junit.jupiter.params.ParameterizedTest;

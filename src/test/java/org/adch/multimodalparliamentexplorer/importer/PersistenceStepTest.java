@@ -1,7 +1,7 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
 import org.adch.multimodalparliamentexplorer.importer.dto.MappedImportResult;
-import org.adch.multimodalparliamentexplorer.importer.steps.PersistenceStep;
+import org.adch.multimodalparliamentexplorer.pipeline.steps.PersistenceStep;
 import org.adch.multimodalparliamentexplorer.member.MongoMemberRepository;
 import org.adch.multimodalparliamentexplorer.member.ParliamentMember;
 import org.adch.multimodalparliamentexplorer.session.MongoSessionRepository;
