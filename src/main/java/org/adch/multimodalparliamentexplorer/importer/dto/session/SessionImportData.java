@@ -9,6 +9,6 @@ public record SessionImportData(
         String xmlUrl,
         SessionMetadata sessionMetadata,
         List<SpeechImportData> speechesImportData,
-        List<SpeakerData> speakersImportData
+        List<SpeakerImportData> speakersImportData
 ) {
 }
