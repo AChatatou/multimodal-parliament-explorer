@@ -15,13 +15,13 @@ public interface SessionMapper {
 
     Speech fromSpeechImportData(SpeechImportData speechImportData);
 
-    @Mapping(target = "sourceXmlUrl", source = "xmlUrl")
-    @Mapping(target = "sessionNumber", source = "sessionMetadata.sessionNumber")
-    @Mapping(target = "legislativePeriod", source = "sessionMetadata.legislativePeriod")
-    @Mapping(target = "sessionDate", source = "sessionMetadata.date")
-    @Mapping(target = "startTime", source = "sessionMetadata.startTime")
-    @Mapping(target = "endTime", source = "sessionMetadata.endTime")
-    @Mapping(target = "speeches", source = "speechesImportData")
+    @Mapping(target = "sourceXmlUrl", source = "sessionImportData.xmlUrl")
+    @Mapping(target = "sessionNumber", source = "sessionImportData.sessionMetadata.sessionNumber")
+    @Mapping(target = "legislativePeriod", source = "sessionImportData.sessionMetadata.legislativePeriod")
+    @Mapping(target = "sessionDate", source = "sessionImportData.sessionMetadata.date")
+    @Mapping(target = "startTime", source = "sessionImportData.sessionMetadata.startTime")
+    @Mapping(target = "endTime", source = "sessionImportData.sessionMetadata.endTime")
+    @Mapping(target = "speeches", source = "sessionImportData.speechesImportData")
     @Mapping(target = "importDate", source = "importDate")
-    Session fromSessionImportData(SessionImportData data, Instant importDate);
+    Session fromSessionImportData(SessionImportData sessionImportData, Instant importDate);
 }

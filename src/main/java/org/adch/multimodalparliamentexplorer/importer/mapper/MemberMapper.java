@@ -14,5 +14,6 @@ public interface MemberMapper {
 
     @Mapping(target = "photo", source = "mdbPhoto")
     @Mapping(target = "faction", ignore = true)   // not in source
+    @Mapping(target = "id", source = "mdbZipData.id")
     ParliamentMember fromMdbZipData(MdbZipData mdbZipData, MdbPhoto mdbPhoto);
 }
