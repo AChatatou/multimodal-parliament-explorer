@@ -12,6 +12,7 @@ import org.adch.multimodalparliamentexplorer.session.speech.TextSegment;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -138,30 +139,39 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
 
     private static SpeakerImportData extractSpeakerData(Element speechElement) {
 
-        var speakerElement = (Element) speechElement.getElementsByTagName("redner").item(0);
+        Element speakerElement = (Element) speechElement
+                .getElementsByTagName("redner")
+                .item(0);
 
         String speakerId = speakerElement.getAttribute("id");
 
-        String speakerFirstName = speakerElement.getElementsByTagName("vorname")
-                .item(0)
-                .getTextContent().trim();
-
-        String speakerLastName = speakerElement.getElementsByTagName("nachname")
-                .item(0)
-                .getTextContent().trim();
-
-        NodeList factions = speakerElement.getElementsByTagName("fraktion");
-
-        String speakerFaction = factions.getLength() > 0
-                ? factions.item(0).getTextContent().trim()
-                : "Fraktionslos";
+        String speakerTitle = getOptionalText(speakerElement, "title", "");
+        String speakerFirstName = getRequiredText(speakerElement, "vorname");
+        String speakerLastName = getRequiredText(speakerElement, "nachname");
+        String speakerFaction = getOptionalText(speakerElement, "fraktion", "Fraktionslos");
 
         return SpeakerImportData.builder()
                 .speakerId(speakerId)
+                .speakerTitle(speakerTitle)
                 .firstName(speakerFirstName)
                 .lastName(speakerLastName)
                 .faction(speakerFaction)
                 .build();
+    }
+
+    private static String getOptionalText(Element parent, String tag, String defaultValue) {
+        NodeList nodes = parent.getElementsByTagName(tag);
+        return nodes.getLength() > 0
+                ? nodes.item(0).getTextContent().trim()
+                : defaultValue;
+    }
+
+    private static String getRequiredText(Element parent, String tag) {
+        Node node = parent.getElementsByTagName(tag).item(0);
+        if (node == null) {
+            throw new IllegalArgumentException("Missing required tag: " + tag);
+        }
+        return node.getTextContent().trim();
     }
 
 
