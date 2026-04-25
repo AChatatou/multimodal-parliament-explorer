@@ -53,7 +53,7 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
                 .orElseGet(SessionMetadata::emptyMetadata);
 
         List<SpeechImportData> speechDataList = new ArrayList<>();
-        List<SpeakerData> speakerDataList = new ArrayList<>();
+        List<SpeakerImportData> speakerDataList = new ArrayList<>();
 
         var speechNodes = parsedDocument.getElementsByTagName("rede");
 
@@ -136,7 +136,7 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
                 .build();
     }
 
-    private static SpeakerData extractSpeakerData(Element speechElement) {
+    private static SpeakerImportData extractSpeakerData(Element speechElement) {
 
         var speakerElement = (Element) speechElement.getElementsByTagName("redner").item(0);
 
@@ -156,7 +156,7 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
                 ? factions.item(0).getTextContent().trim()
                 : "Fraktionslos";
 
-        return SpeakerData.builder()
+        return SpeakerImportData.builder()
                 .speakerId(speakerId)
                 .firstName(speakerFirstName)
                 .lastName(speakerLastName)
