@@ -152,7 +152,7 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
 
         return SpeakerImportData.builder()
                 .speakerId(speakerId)
-                .speakerTitle(speakerTitle)
+                .title(speakerTitle)
                 .firstName(speakerFirstName)
                 .lastName(speakerLastName)
                 .faction(speakerFaction)
