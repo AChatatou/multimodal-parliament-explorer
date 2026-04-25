@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@Component
+
 @AllArgsConstructor
 public class PersistenceStep implements PipelineStep<CompletableFuture<List<MappedImportResult>>, CompletableFuture<Void>> {
 

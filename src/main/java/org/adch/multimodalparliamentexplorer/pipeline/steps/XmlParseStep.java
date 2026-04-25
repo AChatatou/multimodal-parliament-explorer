@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @AllArgsConstructor
-@Component
 public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>, CompletableFuture<List<SessionImportData>>> {
 
     private static final List<String> ALLOWED_P_CLASSES = List.of("J_1", "J", "O");

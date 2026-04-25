@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@Component
+
 @AllArgsConstructor
 public class MappingStep implements PipelineStep<CompletableFuture<List<SessionImportData>>, CompletableFuture<List<MappedImportResult>>> {
 
