@@ -46,8 +46,8 @@ public class MappingStep implements PipelineStep<CompletableFuture<List<SessionI
     @Override
     public CompletableFuture<List<MappedImportResult>> process(CompletableFuture<List<SessionImportData>> input) {
         return input
-                .thenCompose(dataList -> {
-                    var futures = dataList.stream()
+                .thenCompose(importDataList -> {
+                    var futures = importDataList.stream()
                             .map(sessionData ->
                                     CompletableFuture.supplyAsync(() -> mappSessionData(sessionData)))
                             .toList();
