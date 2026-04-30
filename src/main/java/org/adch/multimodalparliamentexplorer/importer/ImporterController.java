@@ -2,8 +2,6 @@ package org.adch.multimodalparliamentexplorer.importer;
 
 import lombok.AllArgsConstructor;
 import org.adch.multimodalparliamentexplorer.importer.dto.web.ImporterResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,5 +37,10 @@ public class ImporterController {
             return ResponseEntity.status(409).body("Import already running");
         }
 
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<Boolean> importStatus(){
+        return ResponseEntity.ok(importerService.getRunningState());
     }
 }

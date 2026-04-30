@@ -28,19 +28,14 @@ import java.util.stream.Collectors;
 public class ImporterService {
 
     private XmlIndexDiscovery xmlIndexDiscovery;
-
     private MdbZipReader mdbZipReader;
-
     private MdbPhotoExtractor mdbPhotoExtractor;
-
     private XmlParser xmlParser;
 
     private MemberMapper memberMapper;
-
     private SessionMapper sessionMapper;
 
     private MongoMemberRepository memberRepository;
-
     private MongoSessionRepository sessionRepository;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -101,5 +96,7 @@ public class ImporterService {
     }
 
     public int getSavedSessionsCount() {return (int) sessionRepository.count();}
+
+    public boolean getRunningState(){return running.get();}
 
 }
