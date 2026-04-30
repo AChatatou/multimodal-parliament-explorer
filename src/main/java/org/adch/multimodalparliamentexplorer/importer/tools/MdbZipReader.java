@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer;
+package org.adch.multimodalparliamentexplorer.importer.tools;
 
 import lombok.extern.slf4j.Slf4j;
 import org.adch.multimodalparliamentexplorer.importer.dto.mdb.MdbZipData;

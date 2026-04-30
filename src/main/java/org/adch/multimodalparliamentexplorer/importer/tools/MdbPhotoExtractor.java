@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer;
+package org.adch.multimodalparliamentexplorer.importer.tools;
 
 import org.adch.multimodalparliamentexplorer.importer.dto.mdb.MdbPhoto;
 import org.adch.multimodalparliamentexplorer.parser.HtmlParser;

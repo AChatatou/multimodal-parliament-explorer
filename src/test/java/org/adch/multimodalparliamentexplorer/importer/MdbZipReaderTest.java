@@ -1,14 +1,8 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

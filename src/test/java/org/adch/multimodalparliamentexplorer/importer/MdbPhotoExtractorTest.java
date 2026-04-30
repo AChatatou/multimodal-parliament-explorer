@@ -1,5 +1,6 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
 import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
 import org.junit.jupiter.api.Test;
 

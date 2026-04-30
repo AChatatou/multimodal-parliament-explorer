@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.importer;
+package org.adch.multimodalparliamentexplorer.importer.tools;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

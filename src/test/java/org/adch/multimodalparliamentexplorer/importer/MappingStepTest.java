@@ -6,6 +6,8 @@ import org.adch.multimodalparliamentexplorer.importer.dto.session.SpeakerImportD
 import org.adch.multimodalparliamentexplorer.importer.dto.session.SpeechImportData;
 import org.adch.multimodalparliamentexplorer.importer.mapper.MemberMapper;
 import org.adch.multimodalparliamentexplorer.importer.mapper.SessionMapper;
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.pipeline.steps.MappingStep;
 import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;

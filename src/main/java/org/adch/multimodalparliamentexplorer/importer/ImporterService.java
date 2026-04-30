@@ -1,11 +1,12 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
 import lombok.AllArgsConstructor;
-import org.adch.multimodalparliamentexplorer.importer.dto.session.XmlUrlBatch;
 import org.adch.multimodalparliamentexplorer.importer.mapper.MemberMapper;
 import org.adch.multimodalparliamentexplorer.importer.mapper.SessionMapper;
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
+import org.adch.multimodalparliamentexplorer.importer.tools.XmlIndexDiscovery;
 import org.adch.multimodalparliamentexplorer.member.MongoMemberRepository;
-import org.adch.multimodalparliamentexplorer.parser.HtmlParser;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
 import org.adch.multimodalparliamentexplorer.pipeline.Pipeline;
 import org.adch.multimodalparliamentexplorer.pipeline.steps.MappingStep;

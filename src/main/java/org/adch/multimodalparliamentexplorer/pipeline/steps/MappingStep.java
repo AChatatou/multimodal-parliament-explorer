@@ -2,14 +2,13 @@ package org.adch.multimodalparliamentexplorer.pipeline.steps;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.adch.multimodalparliamentexplorer.importer.MdbPhotoExtractor;
-import org.adch.multimodalparliamentexplorer.importer.MdbZipReader;
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
+import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.importer.dto.MappedImportResult;
 import org.adch.multimodalparliamentexplorer.importer.dto.session.SessionImportData;
 import org.adch.multimodalparliamentexplorer.importer.mapper.MemberMapper;
 import org.adch.multimodalparliamentexplorer.importer.mapper.SessionMapper;
 import org.adch.multimodalparliamentexplorer.pipeline.PipelineStep;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
