@@ -27,7 +27,7 @@ public class MdbZipReader {
 
     private final String zipSource;
     private Document membersXmlDoc;
-    private XmlParser xmlParser;
+    private final XmlParser xmlParser;
 
 
     public MdbZipReader(@Value("${app.datasource.mdb-data}") String zipSource, XmlParser xmlParser){
