@@ -80,6 +80,8 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
             speechDataList.add(speechData);
         }
 
+
+        log.info("Parsed successfully {}", xmlUrl);
         return SessionImportData.builder()
                 .xmlUrl(xmlUrl)
                 .sessionMetadata(metadata)

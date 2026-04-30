@@ -1,6 +1,7 @@
 package org.adch.multimodalparliamentexplorer.pipeline.steps;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.adch.multimodalparliamentexplorer.importer.MdbPhotoExtractor;
 import org.adch.multimodalparliamentexplorer.importer.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.importer.dto.MappedImportResult;
@@ -14,7 +15,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-
+@Slf4j
 @AllArgsConstructor
 public class MappingStep implements PipelineStep<CompletableFuture<List<SessionImportData>>, CompletableFuture<List<MappedImportResult>>> {
 
@@ -38,6 +39,7 @@ public class MappingStep implements PipelineStep<CompletableFuture<List<SessionI
                 })
                 .toList();
 
+        log.info("Mapped data from session {} successfully", sessionData.sessionMetadata().sessionNumber());
         return new MappedImportResult(mappedSession, mappedMemberDataList);
     }
 
