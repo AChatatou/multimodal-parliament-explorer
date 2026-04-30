@@ -180,7 +180,9 @@ public class XmlIndexDiscovery {
         return fetchedBatches.get();
     }
 
-
+    public int getUrlsFetched() {
+        return urlsFetched.get();
+    }
 
 
 }

@@ -60,4 +60,13 @@ public class ImporterService {
                 .collect(Collectors.toSet());
     }
 
+
+    public int getTotalUrlsFound() {
+        return xmlIndexDiscovery.getTotalXmlUrlCount();
+    }
+
+    public int getFetchedUrlsCount(){
+        return xmlIndexDiscovery.getUrlsFetched();
+    }
+
 }
