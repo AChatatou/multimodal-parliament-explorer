@@ -20,16 +20,24 @@ public class ImporterController {
     private final ImporterService importerService;
 
     @GetMapping
-    public ResponseEntity<ImporterResponse> importData(@RequestParam String legislativePeriod){
+    public ResponseEntity<?> importData(@RequestParam String legislativePeriod){
 
-        importerService.initImport(legislativePeriod);
+        try {
+            importerService.initImport(legislativePeriod);
 
-        var response = new ImporterResponse(LocalDateTime.now(),
-                importerService.getTotalUrlsFound(),
-                importerService.getSavedSessionsCount());
+            var response = new ImporterResponse(
+                    true,
+                    LocalDateTime.now(),
+                    importerService.getTotalUrlsFound(),
+                    importerService.getSavedSessionsCount());
 
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(response);
+            return ResponseEntity
+                    .accepted()
+                    .body(response);
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body("Import already running");
+        }
+
     }
 }

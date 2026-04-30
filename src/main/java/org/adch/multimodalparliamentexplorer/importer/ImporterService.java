@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,8 +43,16 @@ public class ImporterService {
 
     private MongoSessionRepository sessionRepository;
 
+    private final AtomicBoolean running = new AtomicBoolean(false);
+
 
     public CompletableFuture<Void> initImport(String legislativePeriod){
+
+        if (!running.compareAndSet(false, true)) {
+            return CompletableFuture.failedFuture(
+                    new IllegalStateException("Import already running")
+            );
+        }
 
         var savedSessions = getSavedSessionXmlUrls(legislativePeriod);
 
@@ -59,17 +68,19 @@ public class ImporterService {
         while (xmlIndexDiscovery.hasNext()) {
 
             chain = chain.thenCompose(v ->
-                    xmlIndexDiscovery.getNextUrlBatch() // <-- NO join
+                    xmlIndexDiscovery.getNextUrlBatch()
                             .thenCompose(batch ->
                                     AsyncPipeline.of(new XmlParseStep(xmlParser))
                                             .then(new MappingStep(sessionMapper, memberMapper, mdbZipReader, mdbPhotoExtractor))
                                             .then(new PersistenceStep(sessionRepository, memberRepository))
                                             .execute(batch)
-                )
-        );
+                            )
+            );
         }
 
-        return chain;
+        return chain.whenComplete((res, ex) -> {
+            running.set(false);
+        });
     }
 
     public Set<String> getSavedSessionXmlUrls(String legislativePeriod){
