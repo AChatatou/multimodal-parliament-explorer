@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -27,6 +28,7 @@ public class XmlIndexDiscovery {
     private final String sourceUrl;
     private String baseUrl = "";
     private int totalXmlUrlCount;
+    private AtomicInteger urlsFetched = new AtomicInteger(0);
     private List<CompletableFuture<XmlUrlBatch>> batchesFutures = new ArrayList<>();
     private final AtomicInteger fetchedBatches = new AtomicInteger(0);
     private final HtmlParser htmlParser;
@@ -100,19 +102,24 @@ public class XmlIndexDiscovery {
         }
     }
 
-    private XmlUrlBatch extractXmlUrlsFromPage(Document html) {
-        return new XmlUrlBatch(
+    private XmlUrlBatch extractXmlUrlsFromPage(Document html, Set<String> urlsToSkip) {
+        var batch = new XmlUrlBatch(
                 html
                 .select("a[href]")
                 .stream()
                 .map(element -> element.attr("href").trim())
                 .filter(href -> !href.isBlank() && href.endsWith(".xml"))
+                .filter(href -> ! urlsToSkip.contains(href))
                 .toList()
         );
+        //System.out.println(batch.xmlUrls());
+        urlsFetched.addAndGet(batch.batchSize());
+
+        return batch;
     }
 
 
-    public void initDiscovery(String legislativePeriod) {
+    public void initDiscovery(String legislativePeriod, Set<String> urlsToSkip) {
         extractBaseImportUrl(legislativePeriod);
 
         var firstPage = htmlParser.fetchAndParse(baseUrl);
@@ -122,17 +129,22 @@ public class XmlIndexDiscovery {
 
         futures.add(
                 CompletableFuture.completedFuture(firstPage)
-                        .thenApply(this::extractXmlUrlsFromPage)
+                        .thenApply(document -> extractXmlUrlsFromPage(document, urlsToSkip))
         );
 
         IntStream.iterate(10, i -> i < totalXmlUrlCount, i -> i + 10)
                 .mapToObj(i -> baseUrl + "?offset=" + i)
                 .map(url -> CompletableFuture.supplyAsync(() -> htmlParser.fetchAndParse(url))
-                        .thenApply(this::extractXmlUrlsFromPage))
+                        .thenApply(document -> extractXmlUrlsFromPage(document, urlsToSkip)))
                 .forEach(futures::add);
 
-        log.info("Selected legislative period: {}, Extracted {} batches of XML urls (Max batch size: 10). Total urls available: {}", legislativePeriod,  futures.size(), totalXmlUrlCount);
+        log.info("Selected legislative period: {}, Found {} batches of XML urls (Max batch size: 10)", legislativePeriod,  futures.size());
+        log.info("Total URLs: {}. URLs to be fetched: {}", totalXmlUrlCount, urlsFetched.get());
         this.batchesFutures = futures;
+    }
+
+    public boolean hasNext() {
+        return batchesFutures != null && ! batchesFutures.isEmpty() && fetchedBatches.get() < batchesFutures.size();
     }
 
 
@@ -155,6 +167,8 @@ public class XmlIndexDiscovery {
     public void reset() {
         fetchedBatches.set(0);
         batchesFutures.clear();
+        totalXmlUrlCount = 0;
+        urlsFetched.set(0);
     }
 
 
