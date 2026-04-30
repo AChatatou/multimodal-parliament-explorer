@@ -225,7 +225,7 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
 
                         return CompletableFuture
                                 .allOf(futures.toArray(new CompletableFuture[0]))
-                                .thenApplyAsync(v->
+                                .thenApply(v->
                                         futures.stream()
                                                 .map(CompletableFuture::join)
                                                 .flatMap(Optional::stream)

@@ -21,7 +21,7 @@ public class PersistenceStep implements PipelineStep<CompletableFuture<List<Mapp
     @Override
     public CompletableFuture<Void> process(CompletableFuture<List<MappedImportResult>> input) {
 
-        return input.thenAccept(results -> {
+        return input.thenAcceptAsync(results -> {
             memberRepository.saveAll(
                     results.stream()
                             .flatMap(r -> r.members().stream())
