@@ -1,6 +1,7 @@
 package org.adch.multimodalparliamentexplorer.importer;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.adch.multimodalparliamentexplorer.importer.mapper.MemberMapper;
 import org.adch.multimodalparliamentexplorer.importer.mapper.SessionMapper;
 import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
@@ -20,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class ImporterService {
 
@@ -45,6 +47,11 @@ public class ImporterService {
         var savedSessions = getSavedSessionXmlUrls(legislativePeriod);
 
         xmlIndexDiscovery.initDiscovery(legislativePeriod, savedSessions);
+
+        if(savedSessions.size() == xmlIndexDiscovery.getTotalXmlUrlCount()){
+            log.info("The number of URLs found ({}) is equal to the number of saved session. Skipping import ...", savedSessions.size());
+            return;
+        }
 
         while (xmlIndexDiscovery.hasNext()){
             Pipeline.of(new XmlParseStep(xmlParser))
