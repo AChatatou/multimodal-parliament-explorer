@@ -11,7 +11,7 @@ public class Pipeline<I, O> {
         this.pipeline = pipeline;
     }
 
-    public static <T> Pipeline<T, T> of(PipelineStep<T, T> first) {
+    public static <T, U> Pipeline<T, U> of(PipelineStep<T, U> first) {
         return new Pipeline<>(first::process);
     }
 
