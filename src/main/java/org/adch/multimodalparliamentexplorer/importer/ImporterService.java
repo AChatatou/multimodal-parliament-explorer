@@ -9,7 +9,7 @@ import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.importer.tools.XmlIndexDiscovery;
 import org.adch.multimodalparliamentexplorer.member.MongoMemberRepository;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
-import org.adch.multimodalparliamentexplorer.pipeline.Pipeline;
+import org.adch.multimodalparliamentexplorer.pipeline.AsyncPipeline;
 import org.adch.multimodalparliamentexplorer.pipeline.steps.MappingStep;
 import org.adch.multimodalparliamentexplorer.pipeline.steps.PersistenceStep;
 import org.adch.multimodalparliamentexplorer.pipeline.steps.XmlParseStep;
@@ -18,6 +18,7 @@ import org.adch.multimodalparliamentexplorer.session.Session;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,23 +43,33 @@ public class ImporterService {
     private MongoSessionRepository sessionRepository;
 
 
-    public void initImport(String legislativePeriod){
+    public CompletableFuture<Void> initImport(String legislativePeriod){
 
         var savedSessions = getSavedSessionXmlUrls(legislativePeriod);
 
         xmlIndexDiscovery.initDiscovery(legislativePeriod, savedSessions);
 
         if(savedSessions.size() == xmlIndexDiscovery.getTotalXmlUrlCount()){
-            log.info("The number of URLs found ({}) is equal to the number of saved session. Skipping import ...", savedSessions.size());
-            return;
+            log.info("Skipping import...");
+            return CompletableFuture.completedFuture(null);
         }
 
-        while (xmlIndexDiscovery.hasNext()){
-            Pipeline.of(new XmlParseStep(xmlParser))
-                    .then(new MappingStep(sessionMapper, memberMapper, mdbZipReader, mdbPhotoExtractor))
-                    .then(new PersistenceStep(sessionRepository, memberRepository))
-                    .execute(xmlIndexDiscovery.getNextUrlBatch());
+        CompletableFuture<Void> chain = CompletableFuture.completedFuture(null);
+
+        while (xmlIndexDiscovery.hasNext()) {
+
+            chain = chain.thenCompose(v ->
+                    xmlIndexDiscovery.getNextUrlBatch() // <-- NO join
+                            .thenCompose(batch ->
+                                    AsyncPipeline.of(new XmlParseStep(xmlParser))
+                                            .then(new MappingStep(sessionMapper, memberMapper, mdbZipReader, mdbPhotoExtractor))
+                                            .then(new PersistenceStep(sessionRepository, memberRepository))
+                                            .execute(batch)
+                )
+        );
         }
+
+        return chain;
     }
 
     public Set<String> getSavedSessionXmlUrls(String legislativePeriod){

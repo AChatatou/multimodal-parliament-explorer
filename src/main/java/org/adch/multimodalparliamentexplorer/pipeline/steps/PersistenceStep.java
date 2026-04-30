@@ -12,27 +12,30 @@ import java.util.concurrent.CompletableFuture;
 
 
 @AllArgsConstructor
-public class PersistenceStep implements PipelineStep<CompletableFuture<List<MappedImportResult>>, CompletableFuture<Void>> {
+public class PersistenceStep implements PipelineStep<List<MappedImportResult>, Void> {
 
     private MongoSessionRepository sessionRepository;
     private MongoMemberRepository memberRepository;
 
 
     @Override
-    public CompletableFuture<Void> process(CompletableFuture<List<MappedImportResult>> input) {
+    public CompletableFuture<Void> process(List<MappedImportResult> input) {
 
-        return input.thenAcceptAsync(results -> {
+        return CompletableFuture.runAsync(() -> {
+
             memberRepository.saveAll(
-                    results.stream()
+                    input.stream()
                             .flatMap(r -> r.members().stream())
                             .toList()
             );
+
             sessionRepository.saveAll(
-                    results.stream()
+                    input.stream()
                             .map(MappedImportResult::session)
                             .toList()
             );
 
         });
+
     }
 }

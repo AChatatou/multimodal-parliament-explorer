@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @AllArgsConstructor
-public class MappingStep implements PipelineStep<CompletableFuture<List<SessionImportData>>, CompletableFuture<List<MappedImportResult>>> {
+public class MappingStep implements PipelineStep<List<SessionImportData>, List<MappedImportResult>> {
 
     private SessionMapper sessionMapper;
     private MemberMapper memberMapper;
@@ -45,22 +45,21 @@ public class MappingStep implements PipelineStep<CompletableFuture<List<SessionI
 
 
     @Override
-    public CompletableFuture<List<MappedImportResult>> process(CompletableFuture<List<SessionImportData>> input) {
-        return input
-                .thenCompose(importDataList -> {
-                    var futures = importDataList.stream()
-                            .map(sessionData ->
-                                    CompletableFuture.supplyAsync(() -> mappSessionData(sessionData)))
-                            .toList();
+    public CompletableFuture<List<MappedImportResult>> process(List<SessionImportData> input) {
 
-                    return CompletableFuture
-                            .allOf(futures.toArray(new CompletableFuture[0]))
-                            .thenApply(v->
-                                    futures.stream()
-                                            .map(CompletableFuture::join)
-                                            .toList()
-                            );
-                });
+            var futures = input.stream()
+                    .map(sessionData ->
+                            CompletableFuture.supplyAsync(() -> mappSessionData(sessionData)))
+                    .toList();
+
+            return CompletableFuture
+                    .allOf(futures.toArray(new CompletableFuture[0]))
+                    .thenApply(v->
+                            futures.stream()
+                                    .map(CompletableFuture::join)
+                                    .toList()
+                    );
+
     }
 
 }

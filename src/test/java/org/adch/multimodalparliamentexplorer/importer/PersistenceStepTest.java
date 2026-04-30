@@ -54,9 +54,7 @@ public class PersistenceStepTest {
 
         var result1 = new MappedImportResult(session1, List.of(member1));
 
-        var input = CompletableFuture.completedFuture(List.of(result1));
-
-        persistenceStep.process(input).join();
+        persistenceStep.process(List.of(result1));
 
         verify(memberRepository).saveAll(List.of(member1));
         verify(sessionRepository).saveAll(List.of(session1));

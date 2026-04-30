@@ -1,6 +1,8 @@
 package org.adch.multimodalparliamentexplorer.pipeline;
 
+import java.util.concurrent.CompletableFuture;
+
 @FunctionalInterface
 public interface PipelineStep<I, O> {
-    O process(I input);
+    CompletableFuture<O> process(I input);
 }

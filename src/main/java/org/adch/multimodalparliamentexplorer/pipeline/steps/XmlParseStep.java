@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @AllArgsConstructor
-public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>, CompletableFuture<List<SessionImportData>>> {
+public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImportData>> {
 
     private static final List<String> ALLOWED_P_CLASSES = List.of("J_1", "J", "O");
     private XmlParser xmlParser;
@@ -213,26 +213,22 @@ public class XmlParseStep implements PipelineStep<CompletableFuture<XmlUrlBatch>
 
 
     @Override
-    public CompletableFuture<List<SessionImportData>> process(CompletableFuture<XmlUrlBatch> input) {
+    public CompletableFuture<List<SessionImportData>> process(XmlUrlBatch input) {
 
-        return input
-                .thenCompose(
-                    xmlUrlBatch -> {
-                        var futures = xmlUrlBatch.xmlUrls()
-                                .stream()
-                                .map(xmlUrl -> CompletableFuture.supplyAsync(() -> safeExtractDataFromXml(xmlUrl)))
-                                .toList();
+            var futures = input.xmlUrls()
+                    .stream()
+                    .map(xmlUrl -> CompletableFuture.supplyAsync(() -> safeExtractDataFromXml(xmlUrl)))
+                    .toList();
 
-                        return CompletableFuture
-                                .allOf(futures.toArray(new CompletableFuture[0]))
-                                .thenApply(v->
-                                        futures.stream()
-                                                .map(CompletableFuture::join)
-                                                .flatMap(Optional::stream)
-                                                .toList()
-                                );
-                    }
-                );
+            return CompletableFuture
+                    .allOf(futures.toArray(new CompletableFuture[0]))
+                    .thenApply(v->
+                            futures.stream()
+                                    .map(CompletableFuture::join)
+                                    .flatMap(Optional::stream)
+                                    .toList()
+                    );
+
     }
 
 
