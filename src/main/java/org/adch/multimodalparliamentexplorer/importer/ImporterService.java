@@ -42,7 +42,9 @@ public class ImporterService {
 
     public void initImport(String legislativePeriod){
 
-        xmlIndexDiscovery.initDiscovery(legislativePeriod, getSavedSessionXmlUrls(legislativePeriod));
+        var savedSessions = getSavedSessionXmlUrls(legislativePeriod);
+
+        xmlIndexDiscovery.initDiscovery(legislativePeriod, savedSessions);
 
         while (xmlIndexDiscovery.hasNext()){
             Pipeline.of(new XmlParseStep(xmlParser))
@@ -68,5 +70,7 @@ public class ImporterService {
     public int getFetchedUrlsCount(){
         return xmlIndexDiscovery.getUrlsFetched();
     }
+
+    public int getSavedSessionsCount() {return (int) sessionRepository.count();}
 
 }

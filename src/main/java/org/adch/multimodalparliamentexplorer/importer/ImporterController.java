@@ -20,13 +20,13 @@ public class ImporterController {
     private final ImporterService importerService;
 
     @GetMapping
-    public ResponseEntity<ImporterResponse> importData(@RequestParam(defaultValue = "21") String legislativePeriod){
+    public ResponseEntity<ImporterResponse> importData(@RequestParam String legislativePeriod){
 
         importerService.initImport(legislativePeriod);
 
         var response = new ImporterResponse(LocalDateTime.now(),
                 importerService.getTotalUrlsFound(),
-                importerService.getFetchedUrlsCount());
+                importerService.getSavedSessionsCount());
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

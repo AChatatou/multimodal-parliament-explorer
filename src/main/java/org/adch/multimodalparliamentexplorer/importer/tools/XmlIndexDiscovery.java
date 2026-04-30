@@ -120,6 +120,7 @@ public class XmlIndexDiscovery {
 
 
     public void initDiscovery(String legislativePeriod, Set<String> urlsToSkip) {
+        reset();
         extractBaseImportUrl(legislativePeriod);
 
         var firstPage = htmlParser.fetchAndParse(baseUrl);
@@ -139,7 +140,7 @@ public class XmlIndexDiscovery {
                 .forEach(futures::add);
 
         log.info("Selected legislative period: {}, Found {} batches of XML urls (Max batch size: 10)", legislativePeriod,  futures.size());
-        log.info("Total URLs: {}. URLs to be fetched: {}", totalXmlUrlCount, urlsFetched.get());
+        log.info("Total URLs: {}", totalXmlUrlCount);
         this.batchesFutures = futures;
     }
 

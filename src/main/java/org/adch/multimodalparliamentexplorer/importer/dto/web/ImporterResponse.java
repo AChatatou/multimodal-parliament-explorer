@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record ImporterResponse(
         LocalDateTime datetime,
-        int totalXmlsFound,
-        int totalXmlsImported
+        int totalSessionXmlsFound,
+        int storedSessionsCount
 ) {
 }
