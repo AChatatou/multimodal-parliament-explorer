@@ -112,7 +112,7 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
 
         return Optional.of(SessionMetadata.builder()
                 .legislativePeriod(period)
-                .sessionNumber(sessionNumber)
+                .sessionNumber(period + sessionNumber)
                 .date(sessionDate)
                 .startTime(sessionStart)
                 .endTime(sessionEnd)
