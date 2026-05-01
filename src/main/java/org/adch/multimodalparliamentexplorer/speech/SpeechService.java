@@ -18,17 +18,21 @@ public class SpeechService {
         return speechRepository.findById(id);
     }
 
-    public Page<Speech> getAllSpeeches(Pageable pageable) {
+    public Page<Speech> getSpeeches(String period, String speakerId, Pageable pageable) {
+
+        if (period != null && speakerId != null) {
+            return speechRepository.findByLegislativePeriodAndSpeakerId(period, speakerId, pageable);
+        }
+
+        if (period != null) {
+            return speechRepository.findByLegislativePeriod(period, pageable);
+        }
+
+        if (speakerId != null) {
+            return speechRepository.findBySpeakerId(speakerId, pageable);
+        }
 
         return speechRepository.findAll(pageable);
     }
 
-    public Page<Speech> getAllSpeeches(String legislativePeriod, Pageable pageable) {
-
-        return speechRepository.findByLegislativePeriod(legislativePeriod, pageable);
-    }
-
-    public List<Speech> getAllMemberSpeeches(String speakerId) {
-        return speechRepository.findBySpeakerId(speakerId);
-    }
 }

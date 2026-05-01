@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface MongoSpeechRepository extends MongoRepository<Speech, String> {
-    List<Speech> findBySpeakerId(String speakerId);
+    Page<Speech> findBySpeakerId(String speakerId , Pageable pageable);
     Page<Speech> findByLegislativePeriod(String legislativePeriod, Pageable pageable);
+
+    Page<Speech> findByLegislativePeriodAndSpeakerId(String period, String speakerId, Pageable pageable);
 }
