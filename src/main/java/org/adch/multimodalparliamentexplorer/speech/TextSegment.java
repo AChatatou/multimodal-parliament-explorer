@@ -1,4 +1,4 @@
-package org.adch.multimodalparliamentexplorer.session.speech;
+package org.adch.multimodalparliamentexplorer.speech;
 
 public record TextSegment(String text) implements Segment {
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.adch.multimodalparliamentexplorer.importer.mapper.MemberMapper;
 import org.adch.multimodalparliamentexplorer.importer.mapper.SessionMapper;
+import org.adch.multimodalparliamentexplorer.importer.mapper.SpeechMapper;
 import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
 import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.importer.tools.XmlIndexDiscovery;
@@ -15,6 +16,7 @@ import org.adch.multimodalparliamentexplorer.pipeline.steps.PersistenceStep;
 import org.adch.multimodalparliamentexplorer.pipeline.steps.XmlParseStep;
 import org.adch.multimodalparliamentexplorer.session.MongoSessionRepository;
 import org.adch.multimodalparliamentexplorer.session.Session;
+import org.adch.multimodalparliamentexplorer.speech.MongoSpeechRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -34,9 +36,11 @@ public class ImporterService {
 
     private MemberMapper memberMapper;
     private SessionMapper sessionMapper;
+    private SpeechMapper speechMapper;
 
     private MongoMemberRepository memberRepository;
     private MongoSessionRepository sessionRepository;
+    private MongoSpeechRepository speechRepository;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
@@ -66,8 +70,8 @@ public class ImporterService {
                     xmlIndexDiscovery.getNextUrlBatch()
                             .thenCompose(batch ->
                                     AsyncPipeline.of(new XmlParseStep(xmlParser))
-                                            .then(new MappingStep(sessionMapper, memberMapper, mdbZipReader, mdbPhotoExtractor))
-                                            .then(new PersistenceStep(sessionRepository, memberRepository))
+                                            .then(new MappingStep(sessionMapper, memberMapper, speechMapper, mdbZipReader, mdbPhotoExtractor))
+                                            .then(new PersistenceStep(sessionRepository, memberRepository, speechRepository))
                                             .execute(batch)
                             )
             );

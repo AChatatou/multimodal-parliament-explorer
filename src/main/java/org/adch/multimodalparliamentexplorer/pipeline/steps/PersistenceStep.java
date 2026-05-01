@@ -7,7 +7,7 @@ import org.adch.multimodalparliamentexplorer.member.MongoMemberRepository;
 import org.adch.multimodalparliamentexplorer.pipeline.PipelineStep;
 import org.adch.multimodalparliamentexplorer.session.MongoSessionRepository;
 import org.adch.multimodalparliamentexplorer.session.Session;
-import org.springframework.stereotype.Component;
+import org.adch.multimodalparliamentexplorer.speech.MongoSpeechRepository;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -19,6 +19,7 @@ public class PersistenceStep implements PipelineStep<List<MappedImportResult>, V
 
     private MongoSessionRepository sessionRepository;
     private MongoMemberRepository memberRepository;
+    private MongoSpeechRepository speechRepository;
 
 
     @Override
@@ -29,6 +30,12 @@ public class PersistenceStep implements PipelineStep<List<MappedImportResult>, V
             memberRepository.saveAll(
                     input.stream()
                             .flatMap(r -> r.members().stream())
+                            .toList()
+            );
+
+            speechRepository.saveAll(
+                    input.stream()
+                            .flatMap(r -> r.speeches().stream())
                             .toList()
             );
 

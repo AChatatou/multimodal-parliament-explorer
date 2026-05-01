@@ -6,10 +6,9 @@ import org.adch.multimodalparliamentexplorer.importer.dto.session.*;
 import org.adch.multimodalparliamentexplorer.importer.util.DateTimeFormat;
 import org.adch.multimodalparliamentexplorer.parser.XmlParser;
 import org.adch.multimodalparliamentexplorer.pipeline.PipelineStep;
-import org.adch.multimodalparliamentexplorer.session.speech.Comment;
-import org.adch.multimodalparliamentexplorer.session.speech.Segment;
-import org.adch.multimodalparliamentexplorer.session.speech.TextSegment;
-import org.springframework.stereotype.Component;
+import org.adch.multimodalparliamentexplorer.speech.Comment;
+import org.adch.multimodalparliamentexplorer.speech.Segment;
+import org.adch.multimodalparliamentexplorer.speech.TextSegment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -76,7 +75,7 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
             var speechElement = (Element) (node);
             var speakerData = extractSpeakerData(speechElement);
             speakerDataList.add(speakerData);
-            var speechData = extractSpeechData(speechElement, speakerData.speakerId(), speakerData.faction());
+            var speechData = extractSpeechData(speechElement, metadata.sessionNumber(),speakerData.speakerId(), speakerData.faction());
             speechDataList.add(speechData);
         }
 
@@ -122,7 +121,7 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
     }
 
 
-    private static SpeechImportData extractSpeechData(Element speechElement, String speakerId, String faction) {
+    private static SpeechImportData extractSpeechData(Element speechElement, String sessionNumber, String speakerId, String faction) {
 
         String id = speechElement.getAttribute("id");
 
@@ -132,6 +131,7 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
 
         return SpeechImportData.builder()
                 .id(id)
+                .sessionNumber(sessionNumber)
                 .speakerId(speakerId)
                 .faction(faction)
                 .segments(segments)

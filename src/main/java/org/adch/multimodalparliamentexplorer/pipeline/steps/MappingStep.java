@@ -2,6 +2,7 @@ package org.adch.multimodalparliamentexplorer.pipeline.steps;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.adch.multimodalparliamentexplorer.importer.mapper.SpeechMapper;
 import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
 import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.importer.dto.MappedImportResult;
@@ -20,26 +21,37 @@ public class MappingStep implements PipelineStep<List<SessionImportData>, List<M
 
     private SessionMapper sessionMapper;
     private MemberMapper memberMapper;
+    private SpeechMapper speechMapper;
     private MdbZipReader mdbZipReader;
     private MdbPhotoExtractor mdbPhotoExtractor;
 
 
     public MappedImportResult mappSessionData(SessionImportData sessionData) {
 
-        var mappedSession = sessionMapper.fromSessionImportData(sessionData, Instant.now());
         var mappedMemberDataList = sessionData.speakersImportData()
                 .stream()
                 .map(speakerData -> {
                     var mdbZipData = mdbZipReader.extractMemberData(speakerData.speakerId());
-                    var mdbPhoto = mdbPhotoExtractor.getMemberPhoto(speakerData.title(),
-                            speakerData.firstName(),
-                            speakerData.lastName());
+                    var mdbPhoto = mdbPhotoExtractor
+                            .getMemberPhoto(
+                                speakerData.title(),
+                                speakerData.firstName(),
+                                speakerData.lastName());
+
                     return memberMapper.fromMdbZipData(mdbZipData, mdbPhoto);
                 })
                 .toList();
 
+        var mappedSpeeches = sessionData.speechesImportData()
+                .stream()
+                .map(speechImportData ->
+                        speechMapper.fromSpeechImportData(speechImportData))
+                .toList();
+
+        var mappedSession = sessionMapper.fromSessionImportData(sessionData, Instant.now());
+
         log.info("Mapped data from session {} successfully", sessionData.sessionMetadata().sessionNumber());
-        return new MappedImportResult(mappedSession, mappedMemberDataList);
+        return new MappedImportResult(mappedSession, mappedSpeeches, mappedMemberDataList);
     }
 
 

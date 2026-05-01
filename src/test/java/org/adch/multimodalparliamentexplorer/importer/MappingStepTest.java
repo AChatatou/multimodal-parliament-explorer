@@ -6,6 +6,7 @@ import org.adch.multimodalparliamentexplorer.importer.dto.session.SpeakerImportD
 import org.adch.multimodalparliamentexplorer.importer.dto.session.SpeechImportData;
 import org.adch.multimodalparliamentexplorer.importer.mapper.MemberMapper;
 import org.adch.multimodalparliamentexplorer.importer.mapper.SessionMapper;
+import org.adch.multimodalparliamentexplorer.importer.mapper.SpeechMapper;
 import org.adch.multimodalparliamentexplorer.importer.tools.MdbPhotoExtractor;
 import org.adch.multimodalparliamentexplorer.importer.tools.MdbZipReader;
 import org.adch.multimodalparliamentexplorer.pipeline.steps.MappingStep;
@@ -26,9 +27,10 @@ public class MappingStepTest {
     private final XmlParser xmlParser = new XmlParser();
     private final SessionMapper sessionMapper = Mappers.getMapper(SessionMapper.class);
     private final MemberMapper memberMapper = Mappers.getMapper(MemberMapper.class);
+    private final SpeechMapper speechMapper = Mappers.getMapper(SpeechMapper.class);
     private final MdbZipReader mdbZipReader = new MdbZipReader("https://www.bundestag.de/resource/blob/472878/MdB-Stammdaten.zip", xmlParser);
     private final MdbPhotoExtractor mdbPhotoExtractor = new MdbPhotoExtractor("https://www.bundestag.de/ajax/filterlist/webarchiv/abgeordnete/biografien20/862712-862712", new HtmlParser());
-    private final MappingStep mappingStep = new MappingStep(sessionMapper, memberMapper, mdbZipReader, mdbPhotoExtractor);
+    private final MappingStep mappingStep = new MappingStep(sessionMapper, memberMapper, speechMapper, mdbZipReader, mdbPhotoExtractor);
 
 
     @Test
@@ -69,7 +71,7 @@ public class MappingStepTest {
         assertEquals(LocalTime.of(8, 0), result.session().getStartTime());
 
         assertEquals(1, result.session().getSpeeches().size());
-        assertEquals("speechId", result.session().getSpeeches().getFirst().getId());
+        assertEquals("speechId", result.session().getSpeeches().getFirst());
 
         assertEquals(1, result.members().size());
         assertEquals("11005000", result.members().getFirst().getId());
