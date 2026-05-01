@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public record SpeechImportData(
         String id,
+        String legislativePeriod,
         String sessionNumber,
         String speakerId,
         String faction,

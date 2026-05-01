@@ -75,7 +75,7 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
             var speechElement = (Element) (node);
             var speakerData = extractSpeakerData(speechElement);
             speakerDataList.add(speakerData);
-            var speechData = extractSpeechData(speechElement, metadata.sessionNumber(),speakerData.speakerId(), speakerData.faction());
+            var speechData = extractSpeechData(speechElement, metadata,speakerData.speakerId(), speakerData.faction());
             speechDataList.add(speechData);
         }
 
@@ -121,7 +121,7 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
     }
 
 
-    private static SpeechImportData extractSpeechData(Element speechElement, String sessionNumber, String speakerId, String faction) {
+    private static SpeechImportData extractSpeechData(Element speechElement, SessionMetadata metadata, String speakerId, String faction) {
 
         String id = speechElement.getAttribute("id");
 
@@ -131,7 +131,8 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
 
         return SpeechImportData.builder()
                 .id(id)
-                .sessionNumber(sessionNumber)
+                .legislativePeriod(metadata.legislativePeriod())
+                .sessionNumber(metadata.sessionNumber())
                 .speakerId(speakerId)
                 .faction(faction)
                 .segments(segments)

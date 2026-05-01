@@ -20,6 +20,8 @@ public class Speech {
 
     private String sessionNumber;
 
+    private String legislativePeriod;
+
     private String speakerId;
 
     private String faction;
