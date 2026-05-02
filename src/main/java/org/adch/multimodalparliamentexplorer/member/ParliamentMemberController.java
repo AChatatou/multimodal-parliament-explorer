@@ -33,11 +33,6 @@ public class ParliamentMemberController {
         return ResponseEntity.ok(memberService.getDistinctParties());
     }
 
-    @GetMapping("/factions")
-    public ResponseEntity<?> getAllFactions() {
-        return ResponseEntity.ok(memberService.getDistinctFactions());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ParliamentMember> getMember(@PathVariable String id){
 

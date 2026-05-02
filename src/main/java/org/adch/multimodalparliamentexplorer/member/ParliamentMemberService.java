@@ -23,8 +23,7 @@ public class ParliamentMemberService {
                 new MemberListDto(member.getId(),
                                     member.getFirstName(),
                                     member.getLastName(),
-                                    member.getParty(),
-                                    member.getFaction()
+                                    member.getParty()
                 )
         );
     }
@@ -58,9 +57,7 @@ public class ParliamentMemberService {
         return getDistinctField("party");
     }
 
-    public List<String> getDistinctFactions() {
-        return getDistinctField("faction");
-    }
+
 
 
 }

@@ -18,7 +18,6 @@ public class ParliamentMember {
     private String firstName;
     private String lastName;
     private String occupation;
-    private String faction;
     private String party;
     private ParliamentMemberPhoto photo;
     private String biography;

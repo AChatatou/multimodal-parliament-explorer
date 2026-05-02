@@ -4,7 +4,6 @@ public record MemberListDto(
         String id,
         String firstName,
         String lastName,
-        String Party,
-        String faction
+        String Party
 ) {
 }
