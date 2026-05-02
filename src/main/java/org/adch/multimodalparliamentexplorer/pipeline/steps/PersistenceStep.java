@@ -45,7 +45,7 @@ public class PersistenceStep implements PipelineStep<List<MappedImportResult>, V
 
             sessionRepository.saveAll(sessions);
 
-            log.info("Saved data of sessions {}", sessions.stream().map(Session::getSessionNumber));
+            log.info("Saved data of sessions {}", sessions.stream().map(Session::getSessionNumber).toList());
         });
 
     }
