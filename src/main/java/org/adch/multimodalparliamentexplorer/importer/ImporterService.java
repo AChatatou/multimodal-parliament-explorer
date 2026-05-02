@@ -19,6 +19,8 @@ import org.adch.multimodalparliamentexplorer.session.Session;
 import org.adch.multimodalparliamentexplorer.speech.MongoSpeechRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,24 +64,25 @@ public class ImporterService {
             return CompletableFuture.completedFuture(null);
         }
 
-        CompletableFuture<Void> chain = CompletableFuture.completedFuture(null);
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         while (xmlIndexDiscovery.hasNext()) {
-
-            chain = chain.thenCompose(v ->
+            CompletableFuture<Void> future =
                     xmlIndexDiscovery.getNextUrlBatch()
                             .thenCompose(batch ->
                                     AsyncPipeline.of(new XmlParseStep(xmlParser))
                                             .then(new MappingStep(sessionMapper, memberMapper, speechMapper, mdbZipReader, mdbPhotoExtractor))
                                             .then(new PersistenceStep(sessionRepository, memberRepository, speechRepository))
                                             .execute(batch)
-                            )
-            );
+                            );
+
+            futures.add(future);
         }
 
-        return chain.whenComplete((res, ex) -> {
-            running.set(false);
-        });
+        CompletableFuture<Void> all =
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+        return all.whenComplete((res, ex) -> running.set(false));
     }
 
     public Set<String> getSavedSessionXmlUrls(String legislativePeriod){
