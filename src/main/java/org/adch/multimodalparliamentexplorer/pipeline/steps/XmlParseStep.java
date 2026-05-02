@@ -110,9 +110,12 @@ public class XmlParseStep implements PipelineStep<XmlUrlBatch, List<SessionImpor
         LocalTime sessionEnd = LocalTime.parse(root.getAttribute("sitzung-ende-uhrzeit").trim(),
                 DateTimeFormat.TIME_FORMAT);
 
+        String adjustedPeriodString = String.format("%02d", Integer.parseInt(period));
+        String adjustedNumberString = String.format("%03d", Integer.parseInt(sessionNumber));
+
         return Optional.of(SessionMetadata.builder()
                 .legislativePeriod(period)
-                .sessionNumber(period + sessionNumber)
+                .sessionNumber(adjustedPeriodString + adjustedNumberString)
                 .date(sessionDate)
                 .startTime(sessionStart)
                 .endTime(sessionEnd)
