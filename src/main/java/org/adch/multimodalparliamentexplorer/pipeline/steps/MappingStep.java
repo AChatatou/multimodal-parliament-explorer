@@ -50,7 +50,7 @@ public class MappingStep implements PipelineStep<List<SessionImportData>, List<M
 
         var mappedSession = sessionMapper.fromSessionImportData(sessionData, Instant.now());
 
-        log.info("Mapped data from session {} successfully", sessionData.sessionMetadata().sessionNumber());
+        log.info("Mapped data of session {} successfully", sessionData.sessionMetadata().sessionNumber());
         return new MappedImportResult(mappedSession, mappedSpeeches, mappedMemberDataList);
     }
 
