@@ -57,18 +57,12 @@ public class NLPDataImporter {
     }
 
 
-    public List<JCas> importAllXmis(){
-
-        if (!importRunning.compareAndSet(false, true)) {
-            log.warn("NLP import is already running");
-            return List.of();
-        }
+    public List<CompletableFuture<JCas>> importAllXmis(){
 
         Path dir = Path.of(source);
 
         if (!Files.isDirectory(dir)) {
             log.warn("The provided path is not  directory");
-            importRunning.set(false);
             return List.of();
         }
 
@@ -103,29 +97,17 @@ public class NLPDataImporter {
                 }))
                 .toList();
 
-        List<JCas> result;
-        try {
-            result = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                    .thenApply(v -> futures.stream()
-                            .map(CompletableFuture::join)
-                            .filter(Objects::nonNull)
-                            .toList()
-                    )
-                    .join();
-        } finally {
-            importRunning.set(false);
-        }
 
         log.info("Import finished. Total: {}, Successful: {}, Failed: {}",
                 xmiFiles.size(),
-                result.size(),
+                futures.size(),
                 failedFiles.size());
 
         if (!failedFiles.isEmpty()) {
             log.warn("Files that failed to import: {}", failedFiles);
         }
 
-        return result;
+        return futures;
     }
 
 

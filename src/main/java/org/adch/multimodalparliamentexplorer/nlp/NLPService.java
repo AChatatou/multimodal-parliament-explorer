@@ -3,13 +3,17 @@ package org.adch.multimodalparliamentexplorer.nlp;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.adch.multimodalparliamentexplorer.nlp.mapper.JcasMapper;
+import org.adch.multimodalparliamentexplorer.speech.MongoSpeechRepository;
 import org.adch.multimodalparliamentexplorer.speech.Speech;
 import org.apache.uima.jcas.JCas;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,33 +21,48 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class NLPService {
 
-    private SpeechNlpDataRepository repository;
+    private SpeechNlpDataRepository nlpRepository;
+    private MongoSpeechRepository speechRepository;
     private NLPAnalyser analyser;
     private NLPDataImporter importer;
+    private final AtomicBoolean importRunning = new AtomicBoolean(false);
 
 
-    public CompletableFuture<SpeechNlpData> fetchSpeechNlpData(Speech speech, boolean runIfNotFound) {
+    public CompletableFuture<Optional<SpeechNlpData>> fetchSpeechNlpData(String speechId, boolean runIfNotFound) {
 
-        return CompletableFuture.supplyAsync(() -> repository.findById(speech.getId()))
+        return CompletableFuture
+                .supplyAsync(() ->
+                    nlpRepository.findById(speechId))
                 .thenCompose(optional -> {
-                    if (optional.isPresent()) {
-                        return CompletableFuture.completedFuture(optional.get());
-                    }
 
-                    log.info("NLP data for speech {} not found", speech.getId());
+                    if (optional.isPresent())
+                        return CompletableFuture.completedFuture(optional);
 
                     if (!runIfNotFound) {
-                        return CompletableFuture.completedFuture(
-                                SpeechNlpData.ofDefault(speech.getId(), speech.getFullText())
-                        );
+                        log.warn("NLP data for speech with id {} not found ", speechId);
+                        return CompletableFuture.completedFuture(Optional.empty());
                     }
 
-                    return CompletableFuture.supplyAsync(() -> {
-                        var jCas = analyse(speech);
-                        var data = JcasMapper.mapNlpData(jCas);
+                    if (!speechRepository.existsById(speechId)) {
+                        log.warn("Speech with id {} does not exist", speechId);
+                        return CompletableFuture.completedFuture(Optional.empty());
+                    }
 
-                        return repository.save(data);
-                    });
+                    return CompletableFuture
+                            .supplyAsync(() ->
+                                    speechRepository.findById(speechId)
+                            )
+                            .thenCompose(speechOpt -> speechOpt
+                                            .map(speech ->
+                                                    CompletableFuture
+                                                            .supplyAsync(() -> analyse(speech))
+                                                            .thenApply(JcasMapper::mapNlpData)
+                                                            .thenApply(Optional::of)
+                                            )
+                                            .orElseGet(() ->
+                                                    CompletableFuture.completedFuture(Optional.empty())
+                                            )
+                            );
                 });
     }
 
@@ -58,24 +77,43 @@ public class NLPService {
     }
 
 
-    public List<SpeechNlpData> importAllXmiData() {
+    public CompletableFuture<Void> importAllXmiData() {
 
-        var jCasList = importer.importAllXmis();
+        if (!importRunning.compareAndSet(false, true)) {
+            log.warn("NLP import is already running");
+                return CompletableFuture.failedFuture(
+                        new IllegalStateException("Import already running")
+                );
+        }
 
-        return jCasList.stream()
-                .map(this::saveNlpData)
-                .toList();
+
+        var futures = importer.importAllXmis();
+
+        CompletableFuture<Void> all =
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                        .thenCompose(v -> {
+                            var jCasList = futures.stream()
+                                    .map(CompletableFuture::join)
+                                    .filter(Objects::nonNull)
+                                    .toList();
+
+                            return CompletableFuture.runAsync(() -> saveAllNlpData(jCasList));
+                        });
+
+
+        return all.whenComplete((res, ex) -> importRunning.set(false));
+
     }
 
     public SpeechNlpData saveNlpData(SpeechNlpData speechNlpData) {
 
-        if (repository.existsById(speechNlpData.getId())) {
+        if (nlpRepository.existsById(speechNlpData.getId())) {
             log.info("Speech {} NLP data already exists in the database. Skipping save", speechNlpData.getId());
             return speechNlpData;
         }
 
         log.info("Saving NLP data for Speech {} to database...", speechNlpData.getId());
-        return repository.save(speechNlpData);
+        return nlpRepository.save(speechNlpData);
     }
 
     public SpeechNlpData saveNlpData(JCas jCas) {
@@ -96,7 +134,7 @@ public class NLPService {
         }
 
         // Fetch existing IDs
-        Set<String> existingIds = repository.findAllById(
+        Set<String> existingIds = nlpRepository.findAllById(
                         mappedData.stream()
                                 .map(SpeechNlpData::getId)
                                 .toList()
@@ -115,8 +153,11 @@ public class NLPService {
         }
 
         log.info("Saving {} new NLP data records", newData.size());
-        return repository.saveAll(newData);
+        return nlpRepository.saveAll(newData);
     }
 
 
+    public Boolean getRunningState() {
+        return importRunning.get();
+    }
 }

@@ -27,8 +27,8 @@ public class SpeechNlpData {
     private List<ParagraphData> paragraphData;
 
 
-    public static SpeechNlpData ofDefault(String id, String fullText){
-        return SpeechNlpData.builder().id(id).fullText(fullText).build();
+    public static SpeechNlpData ofDefault(String id){
+        return SpeechNlpData.builder().id(id).build();
     }
 
 }
